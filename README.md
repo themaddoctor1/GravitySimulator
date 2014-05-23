@@ -1,5 +1,4 @@
 #GravitySimulator
-Written By Christopher Hittner
 ##Description
    This program is built simply to simulate gravity in two dimensions. The interface is designed to allow the user to manually add entities into the simulation. The physics engine is pretty simple in concept. Every object in the simulator, referred to as entities, is gravitated towards the others every time the game cycles. This will change the velocity so that objects will be pulled towards each other.
    Due to the intent to maximize the simplicity of the program and its code, I have used a collision system where two colliding objects will become one if they collide. Their masses, as well as volume and momentum, will combine and will form a single entity.
