@@ -5,14 +5,21 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 /**
  *
- * @author Christopher Hittner
+ * @author WHS-D11B0W20
  */
 public class Main extends Applet implements KeyListener, MouseListener, MouseMotionListener{
     private static Graphics graphics;
     private static Main applet = new Main();
     private static JFrame frame;
+    
+    private static double baryX = 0, baryY = 0, totalMass = 0;
     
     private static double 
             magnitude = 0, 
@@ -22,7 +29,7 @@ public class Main extends Applet implements KeyListener, MouseListener, MouseMot
     
     private int mouseX = 0, mouseY = 0;
     
-    private static boolean paused = false, helping = false;
+    private static boolean paused = false, helping = false, drawBarycenter;
     private static String mode = "MASS";
     
     public Main(){
@@ -82,9 +89,17 @@ public class Main extends Applet implements KeyListener, MouseListener, MouseMot
                     }
                 }
                 
+                baryX = 0;
+                baryY = 0;
+                totalMass = 0;
+                
                 for(Entity e : list){
                     e.move();
                 }
+                
+                
+                
+                
                 for(int i = list.size() - 1; i >= 0; i--){
                     if(list.get(i).getMass() <= 0){
                         list.remove(i);
@@ -94,7 +109,19 @@ public class Main extends Applet implements KeyListener, MouseListener, MouseMot
                         list.remove(i);
                     }
                 }
+                
+                for(Entity e : list){
+                    baryX += e.getMass() * e.getX();
+                    baryY += e.getMass() * e.getY();
+                    totalMass += e.getMass();
+                }
+                
+                if(totalMass > 0){
+                    baryX /= totalMass;
+                    baryY /= totalMass;
+                }
             }
+            
             Thread.sleep(5);
             userRequests();
         }
@@ -153,6 +180,12 @@ public class Main extends Applet implements KeyListener, MouseListener, MouseMot
         g2.drawOval((int)(mouseX - radius), (int)(mouseY - radius), (int)(2 * radius), (int)(2 * radius));
         g2.drawLine(mouseX, mouseY, (int)(mouseX + Math.sqrt(magnitude) * Math.cos(direction)), (int) (mouseY - Math.sqrt(magnitude) * Math.sin(direction)));
         
+        if(drawBarycenter && totalMass > 0){
+            g2.setColor(Color.RED);
+            g2.drawOval(((int) baryX) + (frame.getWidth()/2) - 1, (frame.getHeight()/2) - 1 - ((int) baryY), 2, 2);
+            g2.setColor(Color.WHITE);
+        }
+        
         g2.setFont(new Font("Courier New", Font.BOLD, 16));
         g2.drawString("Setting: " + mode, 12, 12);
         if(paused){
@@ -163,12 +196,13 @@ public class Main extends Applet implements KeyListener, MouseListener, MouseMot
             g2.drawString("Help Menu", 12, 40);
             g2.setFont(new Font("Courier New", Font.BOLD, 16));
             g2.drawString("Key    Description", 12, 60);
-            g2.drawString(" H     Shows help menu", 12, 72);
-            g2.drawString(" M     Sets input mode to Mass", 12, 84);
-            g2.drawString(" P     Pauses the simulator", 12, 96);
-            g2.drawString(" R     Sets input mode to Radius", 12, 108);
-            g2.drawString(" -     Lowers value for current setting", 12, 120);
-            g2.drawString(" =     Increases value for current setting", 12, 132);
+            g2.drawString(" B     Toggle Barycenter Display", 12, 72);
+            g2.drawString(" H     Shows help menu", 12, 84);
+            g2.drawString(" M     Sets input mode to Mass", 12, 96);
+            g2.drawString(" P     Pauses the simulator", 12, 108);
+            g2.drawString(" R     Sets input mode to Radius", 12, 120);
+            g2.drawString(" -     Lowers value for current setting", 12, 132);
+            g2.drawString(" =     Increases value for current setting", 12, 144);
             
         } else {
             g2.setFont(new Font("Courier New", Font.BOLD, 24));
@@ -183,6 +217,7 @@ public class Main extends Applet implements KeyListener, MouseListener, MouseMot
         g2.drawString("Direction: " + (int)(Math.toDegrees(direction)% 360.0 + 0.5) + " degrees", 12, frame.getHeight() - 72);
         g2.drawString("Mass: " + (long)(mass * 6.673 * Math.pow(10,-11) + 0.1) + "/G kilograms", 12, frame.getHeight() - 60);
         g2.drawString("Radius: " + radius + " meters", 12, frame.getHeight() - 48);
+        g2.drawString("Showing Barycenter: " + drawBarycenter, 12, frame.getHeight() - 36);
         
         g2.setFont(new Font("Courier New", Font.BOLD, 24));
         g2.drawString("Statistics", frame.getWidth() - 250, frame.getHeight() - 102);
@@ -231,6 +266,8 @@ public class Main extends Applet implements KeyListener, MouseListener, MouseMot
             paused = !paused;
         } else if(ke.getKeyCode() == KeyEvent.VK_H){
             helping = !helping;
+        } else if(ke.getKeyCode() == KeyEvent.VK_B){
+            drawBarycenter = !drawBarycenter;
         }
         
     }
