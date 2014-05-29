@@ -12,6 +12,7 @@ A 2D Gravity simulator with an input system.
 * Left/Right.........Change direction of initial velocity
 * Minus..............Lower the setting for current mode(Mass or Radius)
 * Equals.............Increase the setting for current mode(Mass or Radius)
+* B..................Toggles Barycenter display
 * H..................Toggle Help Menu
 * M..................Switch to Mass mode
 * P..................Pause the simulation
